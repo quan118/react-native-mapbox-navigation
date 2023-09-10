@@ -29,6 +29,10 @@ class MapboxNavigation: UIView, NavigationViewControllerDelegate {
     didSet { setNeedsLayout() }
   }
 
+  @objc var stops: NSArray = [] {
+    didSet { setNeedsLayout() }
+  }
+
   @objc var shouldSimulateRoute: Bool = false
   @objc var showsEndOfRouteFeedback: Bool = false
   @objc var hideStatusView: Bool = false
@@ -73,9 +77,20 @@ class MapboxNavigation: UIView, NavigationViewControllerDelegate {
 
     let originWaypoint = Waypoint(coordinate: CLLocationCoordinate2D(latitude: origin[1] as! CLLocationDegrees, longitude: origin[0] as! CLLocationDegrees))
     let destinationWaypoint = Waypoint(coordinate: CLLocationCoordinate2D(latitude: destination[1] as! CLLocationDegrees, longitude: destination[0] as! CLLocationDegrees))
+    let stopWaypoints = stops.enumerated().compactMap { (index, stop) -> Waypoint? in
+      if let stopArray = stop as? [Double], stopArray.count >= 2 {
+        return Waypoint(coordinate:
+                          CLLocationCoordinate2D(
+                            latitude: CLLocationDegrees(stopArray[1]),
+                            longitude: CLLocationDegrees(stopArray[0])), name: String(index))
+      }
+      return nil
+    }
+
+    let waypoints = [originWaypoint] + stopWaypoints + [destinationWaypoint]
 
     // let options = NavigationRouteOptions(waypoints: [originWaypoint, destinationWaypoint])
-    let options = NavigationRouteOptions(waypoints: [originWaypoint, destinationWaypoint], profileIdentifier: .automobileAvoidingTraffic)
+    let options = NavigationRouteOptions(waypoints: waypoints, profileIdentifier: .automobileAvoidingTraffic)
 
     Directions.shared.calculate(options) { [weak self] (_, result) in
       guard let strongSelf = self, let parentVC = strongSelf.parentViewController else {

@@ -88,6 +88,7 @@ class MapboxNavigation(private val context: ThemedReactContext, private val acce
 
     private var origin: Point? = null
     private var destination: Point? = null
+    private var stops: List<Point>? = null
     private var shouldSimulateRoute = false
     private var showsEndOfRouteFeedback = false
     /**
@@ -627,7 +628,8 @@ class MapboxNavigation(private val context: ThemedReactContext, private val acce
         mapboxNavigation.registerVoiceInstructionsObserver(voiceInstructionsObserver)
         mapboxNavigation.registerRouteProgressObserver(replayProgressObserver)
 
-        this.origin?.let { this.destination?.let { it1 -> this.findRoute(it, it1) } }
+        // this.origin?.let { this.destination?.let { it1 -> this.findRoute(it, it1) } }
+        this.origin?.let { this.destination?.let { it1 -> this.stops?.let { it2 -> this.findRoute(it, it1, it2) } } }
     }
 
     override fun onDetachedFromWindow() {
@@ -649,13 +651,20 @@ class MapboxNavigation(private val context: ThemedReactContext, private val acce
         voiceInstructionsPlayer.shutdown()
     }
 
-    private fun findRoute(origin: Point, destination: Point) {
+    private fun findRoute(origin: Point, destination: Point, stops: List<Point>? = null) {
         try {
+            val coordinatesList = mutableListOf<Point>()
+            coordinatesList.add(origin)
+            if (stops != null) {
+                coordinatesList.addAll(stops!!)
+            }
+            coordinatesList.add(destination)
+
             mapboxNavigation.requestRoutes(
                 RouteOptions.builder()
                     .applyDefaultNavigationOptions()
                     .applyLanguageAndVoiceUnitOptions(context)
-                    .coordinatesList(listOf(origin, destination))
+                    .coordinatesList(coordinatesList)
                     .profile(DirectionsCriteria.PROFILE_DRIVING)
                     .steps(true)
                     .build(),
@@ -755,6 +764,10 @@ class MapboxNavigation(private val context: ThemedReactContext, private val acce
 
     fun setShouldSimulateRoute(shouldSimulateRoute: Boolean) {
         this.shouldSimulateRoute = shouldSimulateRoute
+    }
+
+    fun setStops(stops: List<Point>?) {
+        this.stops = stops
     }
 
     fun setShowsEndOfRouteFeedback(showsEndOfRouteFeedback: Boolean) {

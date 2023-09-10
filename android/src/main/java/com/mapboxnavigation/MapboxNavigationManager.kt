@@ -68,6 +68,21 @@ class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) : Sim
     view.setDestination(Point.fromLngLat(sources.getDouble(0), sources.getDouble(1)))
   }
 
+  // sources is an array of array
+  @ReactProp(name = "stops")
+  fun setStops(view: MapboxNavigationView, sources: ReadableArray?) {
+    if (sources == null) {
+      view.setStops(null)
+      return
+    }
+    val points = mutableListOf<Point>()
+    for (i in 0 until sources.size()) {
+      val source = sources.getArray(i)
+      points.add(Point.fromLngLat(source.getDouble(0), source.getDouble(1)))
+    }
+    view.setStops(points)
+  }
+
   @ReactProp(name = "shouldSimulateRoute")
   fun setShouldSimulateRoute(view: MapboxNavigation, shouldSimulateRoute: Boolean) {
     view.setShouldSimulateRoute(shouldSimulateRoute)

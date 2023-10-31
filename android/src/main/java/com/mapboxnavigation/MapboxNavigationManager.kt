@@ -70,7 +70,7 @@ class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) : Sim
 
   // sources is an array of array
   @ReactProp(name = "stops")
-  fun setStops(view: MapboxNavigationView, sources: ReadableArray?) {
+  fun setStops(view: MapboxNavigation, sources: ReadableArray?) {
     if (sources == null) {
       view.setStops(null)
       return

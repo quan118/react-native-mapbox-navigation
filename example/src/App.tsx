@@ -7,7 +7,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import MapboxNavigation from 'react-native-mapbox-navigation';
+import MapboxNavigation from 'rnc-mapbox-nav';
 
 export default function App() {
   useEffect(() => {
@@ -32,8 +32,12 @@ export default function App() {
   return (
     <View style={styles.container}>
       <MapboxNavigation
-        origin={[-105.140629, 39.760194]}
-        destination={[-105.156544, 39.761801]}
+        origin={[105.78375, 21.00059]}
+        stops={[
+          [105.78553, 21.00035],
+          [105.78638, 20.99982],
+        ]}
+        destination={[105.78676, 20.99897]}
         style={styles.box}
         shouldSimulateRoute
         showsEndOfRouteFeedback
